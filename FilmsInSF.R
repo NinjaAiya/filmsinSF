@@ -156,5 +156,11 @@ movie_map <- left_join(dt, movies, by = 'title') %>%
   select(title, release_year.x, locations, lat, long, imdbID, rating_imdb, poster, genre, sentiment) %>%
   rename(release_year = release_year.x)
 
+# transform movie genres from long to wide format
+movie_map$genre <- gsub(' ','',movie_map$genre)
+genres <- levels(factor(unlist(strsplit(movie_map$genre,','))))
+temp <- as.data.frame(do.call(rbind, lapply(lapply(strsplit(movie_map$genre,','), factor, genres), table)))
+movie_map <- cbind(movie_map, temp)
+
 # save data for shiny app
 write.csv(movie_map,'movie_map.csv')
